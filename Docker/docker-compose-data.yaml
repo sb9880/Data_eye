@@ -1,0 +1,26 @@
+volumes:
+  EYE:
+    external: true  # Uses externally created volume
+
+services:
+  init-data:
+    image: python:3.11
+    volumes:
+      - EYE:/data
+      - /mnt/object/raw_eye_dataset:/source_data:ro  # Mounting dataset folder from object (read-only)
+
+    working_dir: /data
+    command:
+      - bash
+      - -c
+      - |
+        set -e  # Stop on error
+      
+        echo "Copying dataset from /source_data to /data/eye_dataset..."
+
+        mkdir -p /data/eye_dataset
+        cp -r /source_data/* /data/eye_dataset/
+
+        echo "Dataset copied successfully."
+        
+    restart: "no"

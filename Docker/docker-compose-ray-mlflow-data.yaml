@@ -105,7 +105,7 @@ services:
       mlflow server --backend-store-uri postgresql://user:password@postgres/mlflowdb 
       --artifacts-destination s3://mlflow-artifacts/ --serve-artifacts --host 0.0.0.0 --port 8000"
     volumes:
-      - Eye:/mnt/data  # Mount dataset for potential direct access
+      - EYE:/mnt/data  # Mount dataset for potential direct access
 
   # === RAY CLUSTER ===
   ray-head:
@@ -127,7 +127,7 @@ services:
     shm_size: '12g'
     volumes:
       - ray_tmp:/tmp/ray
-      - Eye:/mnt/data
+      - EYE:/mnt/data
     environment:
       - RAY_GRAFANA_HOST=http://grafana:3000
       - RAY_GRAFANA_IFRAME_HOST=http://${HOST_IP}:3000
@@ -193,7 +193,7 @@ services:
       - MLFLOW_TRACKING_URI=http://mlflow:8000
     shm_size: '12g'
     volumes:
-      - Eye:/mnt/data
+      - EYE:/mnt/data
     depends_on:
       - ray-head
 
@@ -216,7 +216,7 @@ services:
       - MLFLOW_TRACKING_URI=http://mlflow:8000
     shm_size: '12g'
     volumes:
-      - Eye:/mnt/data
+      - EYE:/mnt/data
     depends_on:
       - ray-head
 

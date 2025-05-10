@@ -4,7 +4,7 @@ services:
   init-data:
     image: python:3.11
     volumes:
-      EYE: /data 
+      - EYE: /data 
     working_dir: /data
     command:
       - bash

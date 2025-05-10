@@ -5,7 +5,6 @@ services:
     image: python:3.11
     volumes:
       EYE: /data 
-        external: true  # Uses externally created volume
     working_dir: /data
     command:
       - bash

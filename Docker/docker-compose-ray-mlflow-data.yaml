@@ -4,7 +4,7 @@ services:
   init-data:
     image: python:3.11
     volumes:
-      - EYE: /data 
+      - EYE:/data 
     working_dir: /data
     command:
       - bash
@@ -225,5 +225,5 @@ volumes:
   ray_tmp:
   minio_data:
   postgres_data:
-  food11:
+  EYE:
     external: true  # Uses externally created volume

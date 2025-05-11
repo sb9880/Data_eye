@@ -1,5 +1,5 @@
 os
 time
 random
-torch 
+torch torchvision pytorch-lightning
 numpy

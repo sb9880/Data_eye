@@ -15,7 +15,7 @@ services:
         set -e  # Stop on error
         echo "Creating dataset directory..."
         echo "Copying dataset from /source_data to /data/eye_dataset..."
-        mkdir -p /data/eye_dataset
+        mkdir -p /data/transformed_eye_dataset
         cp -r /source_data/* /data/transformed_eye_dataset/
 
         echo "Dataset copied successfully."

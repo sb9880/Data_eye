@@ -1,0 +1,6 @@
+{
+"pip": "requirements.txt",
+"env_vars": {
+"FOOD11_DATA_DIR": "/mnt/Food-11"
+}
+}

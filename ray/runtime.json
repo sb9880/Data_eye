@@ -1,6 +1,6 @@
 {
 "pip": "requirements.txt",
 "env_vars": {
-"FOOD11_DATA_DIR": "/mnt/Food-11"
+"FOOD11_DATA_DIR": "/mnt/trans_eye_dataset"
 }
 }

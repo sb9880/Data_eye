@@ -110,43 +110,93 @@ services:
       - EYE:/mnt/data  # Mount dataset for potential direct access
 
   # === RAY CLUSTER ===
-  ray-head:
-    image: rayproject/ray:2.42.1
-    container_name: ray-head-ml-platform
-    command: |
-      /bin/sh -c "
-      mkdir -p /tmp/ray && 
-      chown -R root:root /tmp/ray &&
-      # Create a custom config for the job server with increased max_body_size
-      mkdir -p /tmp/ray/job_server_config &&
-      echo '{\"http_options\": {\"max_body_size\": 1073741824}}' > /tmp/ray/job_server_config/job_server_config.json &&
-      # Start Ray with the custom job server config
-      ray metrics launch-prometheus &&
-      pip install mlflow boto3 s3fs &&
-      ray start --head --port=6379 --dashboard-host=0.0.0.0 --block --metrics-export-port=8080 --job-config=/tmp/ray/job_server_config/job_server_config.json"
-    ports:
-      - "6379:6379"  # Ray client port
-      - "8265:8265"  # Ray dashboard
-      - "8080:8080"  # Metrics export
-      - "8090:8090"  # Internal Ray metrics
-      - "9090:9090"  # Prometheus
-    shm_size: '12g'
-    volumes:
-      - ray_tmp:/tmp/ray
-      - EYE:/mnt/data
-    environment:
-      - RAY_GRAFANA_HOST=http://grafana-ml-platform:3000
-      - RAY_GRAFANA_IFRAME_HOST=http://${HOST_IP}:3000
-      - RAY_PROMETHEUS_HOST=http://ray-head-ml-platform:9090
-      - RAY_PROMETHEUS_NAME=Prometheus
-      - AWS_ACCESS_KEY_ID=Project24-id
-      - AWS_SECRET_ACCESS_KEY=Project240
-      - AWS_ENDPOINT_URL=http://minio-ml-platform:9000
-      - MLFLOW_TRACKING_URI=http://mlflow-ml-platform:8000
-    user: root
-    depends_on:
-      - mlflow
-      - minio
+ ray-head:
+  image: rayproject/ray:2.42.1
+  container_name: ray-head-ml-platform
+  command: |
+    /bin/sh -c "
+    mkdir -p /tmp/ray && 
+    chown -R root:root /tmp/ray &&
+    ray metrics launch-prometheus &&
+    pip install mlflow boto3 s3fs &&
+    ray start --head --port=6379 --dashboard-host=0.0.0.0 --block --metrics-export-port=8080"
+  ports:
+    - "6379:6379"  # Ray client port
+    - "8265:8265"  # Ray dashboard
+    - "8080:8080"  # Metrics export
+    - "8090:8090"  # Internal Ray metrics
+    - "9090:9090"  # Prometheus
+  shm_size: '12g'
+  volumes:
+    - ray_tmp:/tmp/ray
+    - EYE:/mnt/data
+  environment:
+    - RAY_GRAFANA_HOST=http://grafana-ml-platform:3000
+    - RAY_GRAFANA_IFRAME_HOST=http://${HOST_IP}:3000
+    - RAY_PROMETHEUS_HOST=http://ray-head-ml-platform:9090
+    - RAY_PROMETHEUS_NAME=Prometheus
+    - AWS_ACCESS_KEY_ID=Project24-id
+    - AWS_SECRET_ACCESS_KEY=Project240
+    - AWS_ENDPOINT_URL=http://minio-ml-platform:9000
+    - MLFLOW_TRACKING_URI=http://mlflow-ml-platform:8000
+  user: root
+  depends_on:
+    - mlflow
+    - minio
+
+# Add Ray worker configuration
+ray-worker-1:
+  image: rayproject/ray:2.42.1
+  container_name: ray-worker-1-ml-platform
+  command: |
+    /bin/sh -c "
+    mkdir -p /tmp/ray && 
+    chown -R root:root /tmp/ray &&
+    pip install mlflow boto3 s3fs &&
+    ray start --address=ray-head-ml-platform:6379 --block"
+  shm_size: '12g'
+  volumes:
+    - ray_tmp_worker_1:/tmp/ray
+    - EYE:/mnt/data  # Mount the same EYE volume to worker
+  environment:
+    - AWS_ACCESS_KEY_ID=Project24-id
+    - AWS_SECRET_ACCESS_KEY=Project240
+    - AWS_ENDPOINT_URL=http://minio-ml-platform:9000
+    - MLFLOW_TRACKING_URI=http://mlflow-ml-platform:8000
+  user: root
+  depends_on:
+    - ray-head
+
+# You can add more workers with the same pattern
+ray-worker-2:
+  image: rayproject/ray:2.42.1
+  container_name: ray-worker-2-ml-platform
+  command: |
+    /bin/sh -c "
+    mkdir -p /tmp/ray && 
+    chown -R root:root /tmp/ray &&
+    pip install mlflow boto3 s3fs &&
+    ray start --address=ray-head-ml-platform:6379 --block"
+  shm_size: '12g'
+  volumes:
+    - ray_tmp_worker_2:/tmp/ray
+    - EYE:/mnt/data  # Mount the same EYE volume to worker
+  environment:
+    - AWS_ACCESS_KEY_ID=Project24-id
+    - AWS_SECRET_ACCESS_KEY=Project240
+    - AWS_ENDPOINT_URL=http://minio-ml-platform:9000
+    - MLFLOW_TRACKING_URI=http://mlflow-ml-platform:8000
+  user: root
+  depends_on:
+    - ray-head
+
+# Define volumes at the bottom of your Docker Compose file
+volumes:
+  ray_tmp:
+  ray_tmp_worker_1:
+  ray_tmp_worker_2:
+  EYE:
+    external: true  # If this is an external volume
 
   grafana:
     image: grafana/grafana:latest

@@ -190,13 +190,6 @@ ray-worker-2:
   depends_on:
     - ray-head
 
-# Define volumes at the bottom of your Docker Compose file
-volumes:
-  ray_tmp:
-  ray_tmp_worker_1:
-  ray_tmp_worker_2:
-  EYE:
-    external: true  # If this is an external volume
 
   grafana:
     image: grafana/grafana:latest
@@ -277,8 +270,10 @@ volumes:
       - ray-head
 
 volumes:
-  grafana_storage:
   ray_tmp:
+  ray_tmp_worker_1:
+  ray_tmp_worker_2:
+  grafana_storage:
   minio_data:
   postgres_data:
   EYE:

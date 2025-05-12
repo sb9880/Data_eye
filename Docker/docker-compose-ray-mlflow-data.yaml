@@ -112,14 +112,18 @@ services:
   # === RAY CLUSTER ===
   ray-head:
     image: rayproject/ray:2.42.1
-    container_name: ray-head-ml-platform  # Changed to avoid conflict
+    container_name: ray-head-ml-platform
     command: |
       /bin/sh -c "
       mkdir -p /tmp/ray && 
       chown -R root:root /tmp/ray &&
+      # Create a custom config for the job server with increased max_body_size
+      mkdir -p /tmp/ray/job_server_config &&
+      echo '{\"http_options\": {\"max_body_size\": 1073741824}}' > /tmp/ray/job_server_config/job_server_config.json &&
+      # Start Ray with the custom job server config
       ray metrics launch-prometheus &&
       pip install mlflow boto3 s3fs &&
-      ray start --head --port=6379 --dashboard-host=0.0.0.0 --block --metrics-export-port=8080"
+      ray start --head --port=6379 --dashboard-host=0.0.0.0 --block --metrics-export-port=8080 --job-config=/tmp/ray/job_server_config/job_server_config.json"
     ports:
       - "6379:6379"  # Ray client port
       - "8265:8265"  # Ray dashboard

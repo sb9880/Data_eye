@@ -1,0 +1,7 @@
+{
+"pip": "requirements.txt",
+"env_vars": {
+"EYE_DATA_DIR": "/mnt/transformed_eye_dataset"
+},
+"working_dir": "/home/jovyan/workspace"
+}
